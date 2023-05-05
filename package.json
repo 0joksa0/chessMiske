@@ -1,0 +1,18 @@
+{
+  "name": "chessgame",
+  "version": "1.0.0",
+  "description": "multiplayer chess using Phaser io some libraries and socket io",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "chess.js": "^1.0.0-beta.5",
+    "express": "^4.18.2",
+    "mongodb": "5.3",
+    "phaser": "^3.60.0",
+    "socket.io": "^4.6.1"
+  }
+}

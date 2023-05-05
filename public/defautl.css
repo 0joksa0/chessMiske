@@ -1,0 +1,24 @@
+*{
+    margin: 0;
+}
+
+.header{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: aquamarine;
+    height: 10vh;
+}
+
+.request{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: auto;
+    margin-top: 2rem;
+    background-color: dimgray;
+    height: 80vh;
+    width: 40vw;
+
+}
+
