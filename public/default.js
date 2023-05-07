@@ -1,55 +1,68 @@
 var socket = io();
 var board;
+var side;
+var turn = false;
 socket.on("start", function (arg) {
   //console.log(arg[1][1].type);
+  //preload();
   console.log(arg);
-  board = arg;
+  console.log(board);
+  console.log(side);
+  board = arg[0];
+  side = arg[1];
+  //loadBoard(game.scene.scenes[0], board);
+  //console.log("side :" + side)
+  //console.log(this);
+  //console.log(game.scene.scenes[0]);
+  //console.log(table2);
+
+  // startPos();
 });
 
 socket.on("update", function (arg) {
   //console.log(arg[1][1].type);
   board = arg;
-  killBoard(game.scene)
+  killBoard(game.scene);
   loadBoard(game.scene.scenes[0], board);
-  startPos();
+});
+
+socket.on("turn", function (arg) {
+  if (side == arg){
+    console.log("my turn" + side);
+    startPos();}
 });
 
 socket.on("invalid move", function (arg) {
   startPos();
 });
 
-socket.on("gameOver", function (arg){
+socket.on("gameOver", function (arg) {
   loadBoard(game.scene.scenes[0], board);
   console.log("Game Over!");
   //alert("Game Over!");
-
 });
 
 // window.onclick = function (event) {
 //   socket.emit("message", "from client");
 // };
 
-console.log(socket);
+console.log();
 
 var config = {
+  parent: 'mygame',
   type: Phaser.AUTO,
   width: 1024,
   height: 1024,
-  physics: {
-    default: "arcade",
-    arcade: {
-      gravity: { y: 0 },
-      debug: false,
-    },
-  },
   scene: {
     preload: preload,
     create: create,
     update: update,
-  },
+  }
+
 };
 
 var game = new Phaser.Game(config);
+//game.scale.autoCenter();
 var table = [
   [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
@@ -85,7 +98,6 @@ function preload() {
   this.load.image("wP", "img/chesspieces/wikipedia/wP.png");
   this.load.image("wQ", "img/chesspieces/wikipedia/wQ.png");
   this.load.image("wR", "img/chesspieces/wikipedia/wR.png");
-  this.load.image("empty", "img/chesspieces/empty.png");
 }
 var start = false;
 var dest = false;
@@ -93,12 +105,8 @@ var dest = false;
 function create() {
   loadBackground(this);
   loadBoard(this, board);
-  console.log(this);
-  console.log(game.scene.scenes[0]);
-  console.log(table2);
 
   startPos();
-
   // this.input.on('pointerup', () => {
   //   console.log("pomm")
   // }).setTopOnly(true);
@@ -106,17 +114,16 @@ function create() {
 
 function update() {
   //loadBoard(this, board);
-  
 }
 
 function startPos() {
   for (let i = 0; i < 8; i++) {
     for (let j = 0; j < 8; j++) {
       table2[i][j].once("pointerup", (e) => {
-        if(board[i][j] != null){
-          console.log("start: " +i + j);
-          destination(i, j)
-          return ;
+        if (board[i][j] != null) {
+          console.log("start: " + i + j);
+          destination(i, j);
+          return;
         }
       });
     }
@@ -127,22 +134,24 @@ function destination(sI, sJ) {
   for (let i = 0; i < 8; i++) {
     for (let j = 0; j < 8; j++) {
       if (table2[i][j] != 0) {
-         table2[i][j].once("pointerup", () => {
+        table2[i][j].once("pointerup", () => {
           console.log("destination:" + i + j);
           removeEvent();
-          let move = {from: transformToFen(sI, sJ),to : transformToFen(i, j), promotion: "q"};
-          console.log(move)
+          let move = {
+            from: transformToFen(sI, sJ),
+            to: transformToFen(i, j),
+            promotion: "q",
+          };
+          console.log(move);
           socket.emit("move", move);
           return;
         });
-        
       }
-      
     }
   }
 }
 
-function removeEvent(){
+function removeEvent() {
   for (let i = 0; i < 8; i++) {
     for (let j = 0; j < 8; j++) {
       table2[i][j].off("pointerup");
@@ -150,14 +159,13 @@ function removeEvent(){
   }
 }
 
-function transformToFen(i, j){
+function transformToFen(i, j) {
   let x = 97 + j;
-  let y = 8-i;
-  return (String.fromCharCode(x) + y);
+  let y = 8 - i;
+  return String.fromCharCode(x) + y;
 }
 
-
-function killBoard(scene){
+function killBoard(scene) {
   for (let i = 0; i < 8; i++) {
     for (let j = 0; j < 8; j++) {
       table2[i][j].destroy(true);
@@ -183,10 +191,10 @@ function loadBackground(scene) {
 }
 
 function loadBoard(scene, board) {
-  //console.log(board);
+  console.log(board);
   for (let i = 0; i < 8; i++) {
     for (let j = 0; j < 8; j++) {
-      if ( board[i][j] == null) {
+      if (board[i][j] == null) {
         table2[i][j] = scene.add
           .sprite(64 + j * 128, 64 + i * 128)
           .setInteractive()
